@@ -1,0 +1,4 @@
+Flask>=2.2
+flask_sqlalchemy>=3.0.3
+psycopg2>=2.9
+pycryptodome>=3.14
