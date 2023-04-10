@@ -131,6 +131,7 @@ def error(err):
           Style.RESET_ALL + "\n\n")
 
     print(f"Error: {err}")
+    input("Press and key to exit.")
     exit(0)
 
 def doGET(url):
@@ -280,6 +281,7 @@ def finish():
     print("WiiLink Deliveroo Login Helper - (c) 2023 WiiLink")
     print(("=" * console_width) + "\n")
     print("Successfully linked account. Please continue following the guide.")
+    input("Press and key to exit.")
     exit(0)
 
 if __name__ == "__main__":
