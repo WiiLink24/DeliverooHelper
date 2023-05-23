@@ -64,10 +64,9 @@ def encode_hex_to_str(array: bytes) -> str:
 @app.post("/receive")
 def receive():
     data = json.loads(request.data)
+    cipher = AES.new(config.KEY, AES.MODE_CBC, iv=config.IV)
+    encrypted_auth = cipher.encrypt(pad(bytes(data["auth"], "utf-8"), AES.block_size))
     try:
-        cipher = AES.new(config.KEY, AES.MODE_CBC, iv=config.IV)
-        encrypted_auth = cipher.encrypt(pad(bytes(data["auth"], "utf-8"), AES.block_size))
-
         user = User(
             discord_id=data["discord_id"],
             basket=[],
@@ -80,11 +79,21 @@ def receive():
         db.session.add(user)
         db.session.commit()
     except Exception as e:
-        print(e.with_traceback(e.__traceback__))
-        return Response(status=500)
-    
+        # Most likely the user already registered.
+        query = User.query.filter_by(discord_id=data["discord_id"]).first()
+        if not query:
+            return Response(status=500)
+
+        query.wii_id = data["wii_id"]
+        query.auth_token = encode_hex_to_str(encrypted_auth)
+        query.roo_uid = data["roo_uid"]
+        db.session.add(query)
+        db.session.commit()
+        return "very good"
+
     return "very good"
-    
+
+
 @app.get("/tos")
 def tos():
     return """
@@ -235,5 +244,3 @@ def privacy():
     <br>
     Monday April 10th 2023
     """
-
-    return "very good"
